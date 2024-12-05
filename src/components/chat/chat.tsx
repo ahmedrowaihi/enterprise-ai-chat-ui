@@ -4,11 +4,10 @@ import { ChatList } from "./chat-list";
 import ChatTopBar from "./chat-top-bar";
 
 interface ChatProps {
-  messages?: Message[];
   selectedUser: UserData;
 }
 
-export function Chat({ messages, selectedUser }: ChatProps) {
+export function Chat({ selectedUser }: ChatProps) {
   const messagesState = useChatStore((state) => state.messages);
 
   const sendMessage = (newMessage: Message) => {
@@ -20,11 +19,7 @@ export function Chat({ messages, selectedUser }: ChatProps) {
   return (
     <div className="ui-flex ui-flex-col ui-justify-between ui-w-full ui-h-full">
       <ChatTopBar selectedUser={selectedUser} />
-      <ChatList
-        messages={messagesState}
-        selectedUser={selectedUser}
-        sendMessage={sendMessage}
-      />
+      <ChatList messages={messagesState} selectedUser={selectedUser} />
     </div>
   );
 }

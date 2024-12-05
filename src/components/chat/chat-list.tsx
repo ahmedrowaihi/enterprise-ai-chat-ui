@@ -17,17 +17,12 @@ import { useEffect, useRef } from "react";
 interface ChatListProps {
   messages: Message[];
   selectedUser: UserData;
-  sendMessage: (newMessage: Message) => void;
 }
 
 const getMessageVariant = (messageName: string, selectedUserName: string) =>
   messageName !== selectedUserName ? "sent" : "received";
 
-export function ChatList({
-  messages,
-  selectedUser,
-  sendMessage,
-}: ChatListProps) {
+export function ChatList({ messages, selectedUser }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (messagesContainerRef.current) {
