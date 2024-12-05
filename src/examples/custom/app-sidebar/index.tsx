@@ -1,7 +1,6 @@
 import useLocalStorageState from "use-local-storage-state";
 import { v4 as uuidv4 } from "uuid";
 
-import { SideThread } from "@/components/chat-layout-custom/types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sidebar,
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Plus, SquarePen, Trash2 } from "lucide-react";
+import { SideThread } from "../types";
 
 export function ChatSidebar() {
   const [threads, setThreads] = useLocalStorageState("threads", {

@@ -1,4 +1,3 @@
-import { CustomChat } from "@/components/chat-layout-custom/chat";
 import {
   Select,
   SelectContent,
@@ -8,13 +7,15 @@ import {
 } from "@/components/ui/select";
 import { useMemo, useState } from "react";
 import "./App.css";
-import { Chatbot, Chatbot2, ChatMessenger } from "./examples";
+import { Chatbot, Chatbot2, ChatMessenger, CustomChat, Dify } from "./examples";
 
 function App() {
   const [selectedChat, setSelectedChat] = useState<string>("messenger");
 
   const renderSelectedChat = useMemo(() => {
     switch (selectedChat) {
+      case "dify":
+        return <Dify />;
       case "messenger":
         return <ChatMessenger />;
       case "chatbot":
@@ -30,11 +31,12 @@ function App() {
 
   return (
     <div className="ui-h-screen ui-min-w-full ui-p-4">
-      <Select onValueChange={setSelectedChat} defaultValue="messenger">
+      <Select onValueChange={setSelectedChat} defaultValue="dify">
         <SelectTrigger className="ui-w-[280px] ui-mb-4">
           <SelectValue placeholder="Select a chat interface" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="dify">Dify</SelectItem>
           <SelectItem value="messenger">Chat Messenger</SelectItem>
           <SelectItem value="chatbot">Chatbot</SelectItem>
           <SelectItem value="chatbot2">Chatbot 2</SelectItem>
