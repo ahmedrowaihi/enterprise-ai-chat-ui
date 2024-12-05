@@ -1,7 +1,7 @@
 import useLocalStorageState from "use-local-storage-state";
 import { v4 as uuidv4 } from "uuid";
 
-import { SideThread } from "@/components/chat-layout/types";
+import { SideThread } from "@/components/chat-layout-custom/types";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Sidebar,

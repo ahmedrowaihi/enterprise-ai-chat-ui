@@ -1,119 +1,52 @@
-import "./App.css";
-// import { ChatThreads } from "./components/chat-layout";
-import { Button } from "./components/ui/button";
+import { CustomChat } from "@/components/chat-layout-custom/chat";
 import {
-  ChatBubble,
-  ChatBubbleAvatar,
-  ChatBubbleMessage,
-} from "@/components/ui/chat/chat-bubble";
-import { ChatMessageList } from "./components/ui/chat/chat-message-list";
-import { MediaType, useBreakpoints } from "./hooks/use-breakpoints";
-import { cn } from "./lib/utils";
-import { ChatThreads } from "./components/chat-layout";
-import { ChatInput } from "./components/ui/chat/chat-input";
-import { CornerDownLeft } from "lucide-react";
-import { Mic } from "lucide-react";
-import { Paperclip } from "lucide-react";
-const className = "";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useMemo, useState } from "react";
+import "./App.css";
+import { Chatbot, Chatbot2, ChatMessenger } from "./examples";
+
 function App() {
-  const features = {
-    moreLikeThis: {
-      enabled: true,
-    },
-    opening: {
-      enabled: true,
-    },
-    suggested: {
-      enabled: true,
-    },
-    text2speech: {
-      enabled: true,
-    },
-    speech2text: {
-      enabled: true,
-    },
-    citation: {
-      enabled: true,
-    },
-    moderation: {
-      enabled: true,
-    },
-    file: {
-      image: {
-        enabled: true,
-        detail: "low",
-        number_limits: 3,
-        transfer_methods: [],
-      },
-    },
-    annotationReply: {
-      enabled: true,
-    },
-  };
-  const media = useBreakpoints();
-  const isMobile = media === MediaType.mobile;
+  const [selectedChat, setSelectedChat] = useState<string>("messenger");
+
+  const renderSelectedChat = useMemo(() => {
+    switch (selectedChat) {
+      case "messenger":
+        return <ChatMessenger />;
+      case "chatbot":
+        return <Chatbot />;
+      case "chatbot2":
+        return <Chatbot2 />;
+      case "custom":
+        return <CustomChat />;
+      default:
+        return <ChatMessenger />;
+    }
+  }, [selectedChat]);
+
   return (
-    <div className="ui-h-screen ui-w-full">
-      <div
-        className={cn(
-          "ui-h-full ui-w-full ui-flex-col ui-flex ui-bg-white ui-p-4",
-          className,
-          {
-            "ui-flex-col": isMobile,
-          }
-        )}
-      >
-        {/* <ChatThreads /> */}
-        <ChatMessageList>
-          <ChatBubble variant="sent">
-            <ChatBubbleAvatar fallback="US" />
-            <ChatBubbleMessage variant="sent">
-              Hello, how has your day been? I hope you are doing well.
-            </ChatBubbleMessage>
-          </ChatBubble>
-          <ChatBubble variant="received">
-            <ChatBubbleAvatar fallback="AI" />
-            <ChatBubbleMessage variant="received">
-              Hi, I am doing well, thank you for asking. How can I help you
-              today?
-            </ChatBubbleMessage>
-          </ChatBubble>
-          <ChatBubble variant="received">
-            <ChatBubbleAvatar fallback="AI" />
-            <ChatBubbleMessage isLoading />
-          </ChatBubble>
-        </ChatMessageList>
-        <InputArea />
+    <div className="ui-h-screen ui-min-w-full ui-p-4">
+      <Select onValueChange={setSelectedChat} defaultValue="messenger">
+        <SelectTrigger className="ui-w-[280px] ui-mb-4">
+          <SelectValue placeholder="Select a chat interface" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="messenger">Chat Messenger</SelectItem>
+          <SelectItem value="chatbot">Chatbot</SelectItem>
+          <SelectItem value="chatbot2">Chatbot 2</SelectItem>
+          <SelectItem value="custom">Custom Chat</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <div className="ui-h-[calc(100vh-10vh)] ui-min-w-full">
+        {renderSelectedChat}
       </div>
     </div>
   );
 }
 
 export default App;
-
-function InputArea() {
-  return (
-    <form className="ui-relative ui-rounded-lg ui-border ui-bg-background focus-within:ui-ring-1 focus-within:ui-ring-ring ui-p-1">
-      <ChatInput
-        placeholder="Type your message here..."
-        className="ui-min-h-12 ui-resize-none ui-rounded-lg ui-bg-background ui-border-0 ui-p-3 ui-shadow-none focus-visible:ui-ring-0"
-      />
-      <div className="ui-flex ui-items-center ui-p-3 ui-pt-0">
-        <Button variant="ghost" size="icon">
-          <Paperclip className="ui-size-4" />
-          <span className="ui-sr-only">Attach file</span>
-        </Button>
-
-        <Button variant="ghost" size="icon">
-          <Mic className="ui-size-4" />
-          <span className="ui-sr-only">Use Microphone</span>
-        </Button>
-
-        <Button size="sm" className="ui-ml-auto ui-gap-1.5">
-          Send Message
-          <CornerDownLeft className="ui-size-3.5" />
-        </Button>
-      </div>
-    </form>
-  );
-}
