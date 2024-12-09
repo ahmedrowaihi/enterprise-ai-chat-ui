@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/select";
 import { useMemo, useState } from "react";
 import "./App.css";
-import { Chatbot, Chatbot2, ChatMessenger, CustomChat, Dify } from "./examples";
+import { Chatbot, Chatbot2, ChatMessenger, Dify } from "./examples";
 
 function App() {
   const [selectedChat, setSelectedChat] = useState<string>("dify");
@@ -22,8 +22,6 @@ function App() {
         return <Chatbot />;
       case "chatbot2":
         return <Chatbot2 />;
-      case "custom":
-        return <CustomChat />;
       default:
         return <ChatMessenger />;
     }

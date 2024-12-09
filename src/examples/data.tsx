@@ -4,7 +4,7 @@ export const Users: User[] = [
     avatar:
       "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
     messages: [],
-    name: "Jane Doe",
+    name: "Assistant AI",
   },
   {
     id: 2,
@@ -46,7 +46,7 @@ export const userData: User[] = [
         id: 1,
         avatar:
           "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
-        name: "Jane Doe",
+        name: "Assistant AI",
         message: "Hey, Jakob",
         timestamp: "10:00 AM",
       },
@@ -62,7 +62,7 @@ export const userData: User[] = [
         id: 3,
         avatar:
           "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
-        name: "Jane Doe",
+        name: "Assistant AI",
         message: "How are you?",
         timestamp: "10:02 AM",
       },
@@ -78,7 +78,7 @@ export const userData: User[] = [
         id: 5,
         avatar:
           "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
-        name: "Jane Doe",
+        name: "Assistant AI",
         message: "I am good too!",
         timestamp: "10:04 AM",
       },
@@ -95,7 +95,7 @@ export const userData: User[] = [
         id: 7,
         avatar:
           "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
-        name: "Jane Doe",
+        name: "Assistant AI",
         message: "How has your day been so far?",
         timestamp: "10:06 AM",
       },
@@ -112,11 +112,11 @@ export const userData: User[] = [
         id: 9,
         avatar:
           "https://images.freeimages.com/images/large-previews/971/basic-shape-avatar-1632968.jpg?fmt=webp&h=350",
-        name: "Jane Doe",
+        name: "Assistant AI",
         isLoading: true,
       },
     ],
-    name: "Jane Doe",
+    name: "Assistant AI",
   },
   {
     id: 2,

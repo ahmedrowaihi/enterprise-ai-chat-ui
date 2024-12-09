@@ -11,7 +11,7 @@ import {
 import { useIsMobile } from "@/hooks/use-breakpoints";
 import { cn } from "@/lib/utils";
 import React from "react";
-import { Chat } from "./chat";
+import { ChatView } from "./chat-view";
 
 interface ChatLayoutProps {
   defaultLayout: number[] | undefined;
@@ -57,7 +57,7 @@ export function ChatLayout({
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-        <Chat />
+        <ChatView />
       </ResizablePanel>
     </ResizablePanelGroup>
   );

@@ -7,14 +7,8 @@ import {
 } from "@/examples/data";
 import { create } from "zustand";
 
-export interface Example {
-  name: string;
-  url: string;
-}
-
 interface State {
-  selectedExample: Example;
-  examples: Example[];
+  selectedUser: UserData;
   input: string;
   chatBotMessages: Message[];
   messages: Message[];
@@ -24,15 +18,13 @@ interface State {
 
 interface Actions {
   selectedUser: UserData;
-  setSelectedExample: (example: Example) => void;
-  setExamples: (examples: Example[]) => void;
   setInput: (input: string) => void;
   handleInputChange: (
     e:
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>
   ) => void;
-  setchatBotMessages: (fn: (chatBotMessages: Message[]) => Message[]) => void;
+  setChatBotMessages: (fn: (chatBotMessages: Message[]) => Message[]) => void;
   setMessages: (fn: (messages: Message[]) => Message[]) => void;
   setHasInitialAIResponse: (hasInitialAIResponse: boolean) => void;
   setHasInitialResponse: (hasInitialResponse: boolean) => void;
@@ -41,19 +33,7 @@ interface Actions {
 export const useChatStore = create<State & Actions>()((set) => ({
   selectedUser: Users[4],
 
-  selectedExample: { name: "Messenger example", url: "/" },
-
-  examples: [
-    { name: "Messenger example", url: "/" },
-    { name: "Chatbot example", url: "/chatbot" },
-    { name: "Chatbot2 example", url: "/chatbot2" },
-  ],
-
   input: "",
-
-  setSelectedExample: (selectedExample) => set({ selectedExample }),
-
-  setExamples: (examples) => set({ examples }),
 
   setInput: (input) => set({ input }),
   handleInputChange: (
@@ -63,7 +43,7 @@ export const useChatStore = create<State & Actions>()((set) => ({
   ) => set({ input: e.target.value }),
 
   chatBotMessages: ChatBotMessages,
-  setchatBotMessages: (fn) =>
+  setChatBotMessages: (fn) =>
     set(({ chatBotMessages }) => ({ chatBotMessages: fn(chatBotMessages) })),
 
   messages: userData[0].messages,

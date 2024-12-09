@@ -40,7 +40,7 @@ const ChatAiIcons = [
 
 export function Chatbot() {
   const messages = useChatStore((state) => state.chatBotMessages);
-  const setMessages = useChatStore((state) => state.setchatBotMessages);
+  const setMessages = useChatStore((state) => state.setChatBotMessages);
   const selectedUser = useChatStore((state) => state.selectedUser);
   const input = useChatStore((state) => state.input);
   const setInput = useChatStore((state) => state.setInput);
