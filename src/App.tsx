@@ -10,7 +10,7 @@ import "./App.css";
 import { Chatbot, Chatbot2, ChatMessenger, CustomChat, Dify } from "./examples";
 
 function App() {
-  const [selectedChat, setSelectedChat] = useState<string>("messenger");
+  const [selectedChat, setSelectedChat] = useState<string>("dify");
 
   const renderSelectedChat = useMemo(() => {
     switch (selectedChat) {

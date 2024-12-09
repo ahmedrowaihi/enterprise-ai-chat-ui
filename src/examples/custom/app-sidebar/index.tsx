@@ -81,7 +81,7 @@ export function ChatSidebar() {
                         }}
                         aria-label="Delete thread"
                       >
-                        <Trash2 className="ui-h-4 ui-w-4 ui-bg-muted ui-text-muted-foreground ui-hover:text-destructive" />
+                        <Trash2 className="ui-h-4 ui-w-4 ui-bg-muted ui-text-muted-foreground hover:ui-text-destructive" />
                       </Button>
                     </a>
                   </SidebarMenuButton>

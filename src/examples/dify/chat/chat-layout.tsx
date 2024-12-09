@@ -2,7 +2,7 @@
 
 import { userData } from "@/examples/data";
 
-import { Sidebar } from "../sidebar/sidebar";
+import { Sidebar } from "@/components/sidebar";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -11,19 +11,18 @@ import {
 import { useIsMobile } from "@/hooks/use-breakpoints";
 import { cn } from "@/lib/utils";
 import React from "react";
+import { Chat } from "./chat";
 
 interface ChatLayoutProps {
-  defaultLayout?: number[] | undefined;
+  defaultLayout: number[] | undefined;
   defaultCollapsed?: boolean;
   navCollapsedSize: number;
-  children: React.ReactNode;
 }
 
-export function DifyLayout({
+export function ChatLayout({
   defaultLayout = [320, 480],
   defaultCollapsed = false,
   navCollapsedSize,
-  children,
 }: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
   const [selectedUser, setSelectedUser] = React.useState(userData[0]);
@@ -46,11 +45,19 @@ export function DifyLayout({
             "ui-min-w-[50px] md:ui-min-w-[70px] ui-transition-all ui-duration-300 ui-ease-in-out"
         )}
       >
-        <Sidebar isCollapsed={isCollapsed || isMobile} />
+        <Sidebar
+          isCollapsed={isCollapsed || isMobile}
+          chats={userData.map((user) => ({
+            name: user.name,
+            messages: user.messages ?? [],
+            avatar: user.avatar,
+            variant: selectedUser.name === user.name ? "secondary" : "ghost",
+          }))}
+        />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-        {children}
+        <Chat />
       </ResizablePanel>
     </ResizablePanelGroup>
   );
