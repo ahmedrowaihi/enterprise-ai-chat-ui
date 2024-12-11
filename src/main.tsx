@@ -4,10 +4,21 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <AlertDialogProvider>
-      <App />
-    </AlertDialogProvider>
-  </StrictMode>
-);
+async function prepare() {
+  if (import.meta.env.VITE_MOCK === "true") {
+    const { worker } = await import("./playground/mocks/browser.ts");
+    await worker.start({
+      onUnhandledRequest: "bypass",
+    });
+  }
+}
+
+prepare().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <AlertDialogProvider>
+        <App />
+      </AlertDialogProvider>
+    </StrictMode>
+  );
+});
