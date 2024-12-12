@@ -23,6 +23,7 @@ export const endpoints = {
   basic: "/api/chat",
   sequential: "/api/chat-sequential",
   parallel: "/api/chat-parallel",
+  memory: "/api/chat-memory",
 };
 
 export function Playground() {

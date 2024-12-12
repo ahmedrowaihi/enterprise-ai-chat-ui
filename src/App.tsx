@@ -83,8 +83,8 @@ function useSelectChat() {
           <SelectValue placeholder="Select a chat interface" />
         </SelectTrigger>
         <SelectContent>
-        <SelectItem value="playground">Playground</SelectItem>
-        <SelectItem value="dify">Dify</SelectItem>
+          <SelectItem value="playground">Playground</SelectItem>
+          <SelectItem value="dify">Dify</SelectItem>
           <SelectItem value="messenger">Chat Messenger</SelectItem>
           <SelectItem value="chatbot">Chatbot</SelectItem>
           <SelectItem value="chatbot2">Chatbot 2</SelectItem>
