@@ -1,6 +1,4 @@
 import { http, HttpResponse } from "msw";
-// import { difyHandler } from "./dify-handler";
-// import { basicWorkflowChatbotHandler } from "./events/basic-workflow-chatbot";
 
 import { handlers as eventsHandlers } from "./events";
 export const handlers = [

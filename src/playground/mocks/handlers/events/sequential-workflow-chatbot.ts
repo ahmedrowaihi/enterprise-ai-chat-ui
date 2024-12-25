@@ -1,11 +1,17 @@
-import { http, HttpResponse } from "msw";
-import { NodeType, TASK_ID, WORKFLOW_ID } from "./types";
 import {
-    createMessageEvent,
-    createNodeEvents,
-    createWorkflowEvents,
-    sleep,
-} from "./workflow-utils";
+  createMessageEvent,
+  createNodeEvents,
+  createWorkflowEvents,
+} from "@/playground/mocks/utils";
+import {
+  NodeType,
+  TASK_ID,
+  WORKFLOW_ID,
+  WorkflowRunningStatus,
+} from "@/playground/mocks/utils/event-types";
+import { sleep } from "@/playground/utils";
+
+import { http, HttpResponse } from "msw";
 
 export const sequentialWorkflowChatbotHandler = http.post(
   "/api/chat-sequential",
@@ -72,7 +78,11 @@ export const sequentialWorkflowChatbotHandler = http.post(
         }
 
         // Workflow finished
-        controller.enqueue(encoder.encode(createWorkflowEvents.finished()));
+        controller.enqueue(
+          encoder.encode(
+            createWorkflowEvents.finished(WorkflowRunningStatus.Succeeded)
+          )
+        );
 
         controller.close();
       },

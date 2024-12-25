@@ -1,11 +1,14 @@
-import { http, HttpResponse } from "msw";
+import { sleep } from "@/playground/utils";
 import {
-  createWorkflowEvents,
-  createNodeEvents,
   createMessageEvent,
-  sleep,
-} from "./workflow-utils";
-import { NodeType, TASK_ID, WORKFLOW_ID } from "./types";
+  createNodeEvents,
+  createWorkflowEvents,
+  NodeType,
+  TASK_ID,
+  WORKFLOW_ID,
+  WorkflowRunningStatus,
+} from "@/playground/mocks/utils";
+import { http, HttpResponse } from "msw";
 
 export const memoryWorkflowChatbotHandler = http.post(
   "/api/chat-memory",
@@ -92,7 +95,11 @@ export const memoryWorkflowChatbotHandler = http.post(
         await sleep(500);
 
         // Workflow finished
-        controller.enqueue(encoder.encode(createWorkflowEvents.finished()));
+        controller.enqueue(
+          encoder.encode(
+            createWorkflowEvents.finished(WorkflowRunningStatus.Succeeded)
+          )
+        );
 
         controller.close();
       },

@@ -115,3 +115,7 @@ body {
     @apply ui-bg-background ui-text-foreground;
   }
 }
+#root {
+  min-width: 100%;
+  min-height: 100vb;
+}

@@ -4,7 +4,7 @@ import {
   ChatBubbleActionWrapper,
   ChatBubbleMessage,
 } from "@/components/ui/chat/chat-bubble";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ChatMessageList } from "@/components/ui/chat/chat-message-list";
 import {
   Select,
   SelectContent,
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { actionIcons } from "@/examples/dify/chat/bubbles/shared-actions";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { ChatInputBar } from "./components/chat-input-bar";
 import { WorkflowProcessItem } from "./components/workflow-process-item";
@@ -33,42 +34,37 @@ export function Playground() {
   return (
     <div className="ui-flex ui-flex-col ui-justify-between ui-w-full ui-h-full">
       <SelectEndpoint endpoint={endpoint} setEndpoint={setEndpoint} />
-
-      <ScrollArea className="ui-flex-1 ui-p-4">
-        <div className="ui-space-y-4">
-          {chatList.map((chat) => (
-            <ChatBubble
-              variant={chat.isAnswer ? "received" : "sent"}
-              key={chat.id}
-              className="ui-w-full ui-max-w-full"
-            >
-              <ChatBubbleMessage className="ui-flex ui-flex-col ui-gap-2">
-                {chat.workflowProcess && (
-                  <div className="ui-mt-2">
-                    <WorkflowProcessItem
-                      data={chat.workflowProcess}
-                      expand={chat.workflowProcess.expand}
-                    />
-                  </div>
-                )}
-                <span className="ui-text-sm ui-font-medium">
-                  {chat.content}
-                </span>
-              </ChatBubbleMessage>
-              <ChatBubbleActionWrapper className="ui-opacity-0 group-hover:ui-opacity-100 ui-transition-opacity">
-                {actionIcons.map(({ icon: Icon, type }) => (
-                  <ChatBubbleAction
-                    key={type}
-                    className="ui-size-7"
-                    icon={<Icon className="ui-size-4" />}
-                    onClick={() => console.log(`Action ${type} clicked`)}
+      <ChatMessageList>
+        {chatList.map((chat) => (
+          <ChatBubble
+            variant={chat.isAnswer ? "received" : "sent"}
+            key={chat.id}
+            className={cn(chat.isAnswer ? "ui-text-start" : "ui-text-end")}
+          >
+            <ChatBubbleMessage className="ui-flex ui-flex-col ui-gap-2 ui-min-w-28">
+              {chat.workflowProcess && (
+                <div className="-ui-m-2 ui-mb-1">
+                  <WorkflowProcessItem
+                    data={chat.workflowProcess}
+                    expand={chat.workflowProcess.expand}
                   />
-                ))}
-              </ChatBubbleActionWrapper>
-            </ChatBubble>
-          ))}
-        </div>
-      </ScrollArea>
+                </div>
+              )}
+              <span className="ui-text-sm ui-font-medium">{chat.content}</span>
+            </ChatBubbleMessage>
+            <ChatBubbleActionWrapper className="ui-opacity-0 group-hover:ui-opacity-100 ui-transition-opacity">
+              {actionIcons.map(({ icon: Icon, type }) => (
+                <ChatBubbleAction
+                  key={type}
+                  className="ui-size-6"
+                  icon={<Icon className="ui-size-4" />}
+                  onClick={() => console.log(`Action ${type} clicked`)}
+                />
+              ))}
+            </ChatBubbleActionWrapper>
+          </ChatBubble>
+        ))}
+      </ChatMessageList>
       <ChatInputBar
         message={message}
         isResponding={isResponding}

@@ -8,7 +8,6 @@ import {
 
 import { ChatSkeleton } from "@/components/chat-skeleton";
 import { lazy, Suspense, useMemo, useState } from "react";
-import "./App.css";
 
 const Chatbot = lazy(() =>
   import("./examples/chatbot").then((module) => ({ default: module.Chatbot }))

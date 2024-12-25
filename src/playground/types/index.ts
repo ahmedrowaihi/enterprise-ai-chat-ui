@@ -1,4 +1,7 @@
-import { NodeType, WorkflowRunningStatus } from "../mocks/handlers/events";
+import type {
+  NodeType,
+  WorkflowRunningStatus,
+} from "@/playground/mocks/utils/event-types";
 
 export interface NodeTracing {
   id: string;

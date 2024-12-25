@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils";
 import {
+  NodeType,
+  WorkflowRunningStatus,
+} from "@/playground/mocks/utils/event-types";
+import { WorkflowProcess } from "@/playground/types";
+import {
   AlertCircle,
   ArrowRight,
   Bot,
@@ -12,8 +17,6 @@ import {
   Workflow,
 } from "lucide-react";
 import { useState } from "react";
-import { NodeType, WorkflowRunningStatus } from "../mocks/handlers/events";
-import type { WorkflowProcess } from "../hooks/use-chat";
 
 const getNodeIcon = (type: NodeType, status: WorkflowRunningStatus) => {
   if (status === WorkflowRunningStatus.Running) {

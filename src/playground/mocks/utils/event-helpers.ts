@@ -1,5 +1,5 @@
 import type { EventSourceMessage } from "@microsoft/fetch-event-source";
-import { StreamEventHandlers } from "@/playground/mocks/utils/event-types";
+import { StreamEventHandlers } from "./event-types";
 
 export function parseAndHandleEvent(
   event: EventSourceMessage,
