@@ -20,16 +20,20 @@ import { ChatInputBar } from "./components/chat-input-bar";
 import { WorkflowProcessItem } from "./components/workflow-process-item";
 import { useChat } from "./hooks/use-chat";
 
-export const endpoints = {
-  basic: "/api/chat",
-  sequential: "/api/chat-sequential",
-  parallel: "/api/chat-parallel",
-  memory: "/api/chat-memory",
-};
+const endpoints = {
+  basicWorkflow: "/api/chat",
+  memoryWorkflow: "/api/memory-workflow",
+  sequentialWorkflow: "/api/sequential-workflow",
+} as const;
+
+type EndpointKey = keyof typeof endpoints;
+type EndpointValue = (typeof endpoints)[EndpointKey];
 
 export function Playground() {
-  const [endpoint, setEndpoint] = useState(endpoints.basic);
-  const { chatList, isResponding, message, setMessage, handleSend } = useChat();
+  const [endpoint, setEndpoint] = useState<EndpointValue>(
+    endpoints.basicWorkflow
+  );
+  const { message, setMessage, chatList, isResponding, handleSend } = useChat();
 
   return (
     <div className="ui-flex ui-flex-col ui-justify-between ui-w-full ui-h-full">
@@ -79,11 +83,14 @@ function SelectEndpoint({
   endpoint,
   setEndpoint,
 }: {
-  endpoint: string;
-  setEndpoint: (endpoint: string) => void;
+  endpoint: EndpointValue;
+  setEndpoint: (endpoint: EndpointValue) => void;
 }) {
   return (
-    <Select value={endpoint} onValueChange={(value) => setEndpoint(value)}>
+    <Select
+      value={endpoint}
+      onValueChange={(value) => setEndpoint(value as EndpointValue)}
+    >
       <SelectTrigger className="ui-w-max">
         <SelectValue placeholder="Select a workflow" />
       </SelectTrigger>

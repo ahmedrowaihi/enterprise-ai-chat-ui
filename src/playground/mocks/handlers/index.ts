@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 
-import { handlers as eventsHandlers } from "./events";
+import { eventHandlers } from "./events";
 export const handlers = [
   // hello world post
   http.post("/api/hello-world", () => {
@@ -8,5 +8,5 @@ export const handlers = [
       message: "Hello, world!",
     });
   }),
-  ...eventsHandlers,
+  ...eventHandlers,
 ];
