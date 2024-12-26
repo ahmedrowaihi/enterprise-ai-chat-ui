@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useConfigSelector } from "../store/store-provider";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Pane } from "tweakpane";
 import type { FlowiseConfig } from "../store/config-store-model";
+import { useConfigSelector } from "../store/store-provider";
 
 export function FlowiseConfig() {
   const config = useConfigSelector("config");
@@ -60,4 +61,73 @@ export function FlowiseConfig() {
       </div>
     </div>
   );
+}
+
+export function FlowiseConfigPane() {
+  const config = useConfigSelector("config");
+  const setConfig = useConfigSelector("setConfig");
+  const paneRef = useRef<Pane | null>(null);
+
+  useEffect(() => {
+    // Create pane instance only once
+    if (!paneRef.current) {
+      paneRef.current = new Pane({
+        title: "Flowise Config",
+      });
+    }
+
+    // Skip if pane is not initialized
+    if (!paneRef.current) return;
+
+    // Clear existing bindings
+    paneRef.current.dispose();
+
+    // Create new pane with same container
+    paneRef.current = new Pane({
+      title: "Flowise Config",
+    });
+
+    paneRef.current
+      .addBinding(
+        {
+          apiKey: config.apiKey,
+        },
+        "apiKey"
+      )
+      .on("change", ({ value }) => {
+        setConfig({ ...config, apiKey: value });
+      });
+
+    paneRef.current
+      .addBinding(
+        {
+          baseUrl: config.baseUrl,
+        },
+        "baseUrl"
+      )
+      .on("change", ({ value }) => {
+        setConfig({ ...config, baseUrl: value });
+      });
+
+    paneRef.current
+
+      .addBinding(
+        {
+          chatflowId: config.chatflowId,
+        },
+        "chatflowId"
+      )
+      .on("change", ({ value }) => {
+        setConfig({ ...config, chatflowId: value });
+      });
+
+    return () => {
+      if (paneRef.current) {
+        paneRef.current.dispose();
+        paneRef.current = null;
+      }
+    };
+  }, [config, setConfig]);
+
+  return <div />;
 }
