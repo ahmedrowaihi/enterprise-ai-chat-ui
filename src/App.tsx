@@ -30,6 +30,12 @@ const Playground = lazy(() =>
   import("./playground").then((module) => ({ default: module.Playground }))
 );
 
+const Flowise = lazy(() =>
+  import("./flowise").then((module) => ({
+    default: module.Flowise,
+  }))
+);
+
 function App() {
   const { SelectChat, renderSelectedChat } = useSelectChat();
   return (
@@ -45,6 +51,7 @@ function App() {
 export default App;
 
 type chats =
+  | "flowise"
   | "dify"
   | "playground"
   | "messenger"
@@ -53,12 +60,14 @@ type chats =
   | "custom";
 
 function useSelectChat() {
-  const [selectedChat, setSelectedChat] = useState<chats>("playground");
+  const [selectedChat, setSelectedChat] = useState<chats>("flowise");
 
   const renderSelectedChat = useMemo(() => {
     switch (selectedChat) {
       case "playground":
         return <Playground />;
+      case "flowise":
+        return <Flowise />;
       case "dify":
         return <Dify />;
       case "messenger":
@@ -76,12 +85,13 @@ function useSelectChat() {
     return (
       <Select
         onValueChange={(value: chats) => setSelectedChat(value)}
-        defaultValue="playground"
+        defaultValue="flowise"
       >
         <SelectTrigger className="ui-w-[280px] ui-mb-4">
           <SelectValue placeholder="Select a chat interface" />
         </SelectTrigger>
         <SelectContent>
+          <SelectItem value="flowise">Flowise</SelectItem>
           <SelectItem value="playground">Playground</SelectItem>
           <SelectItem value="dify">Dify</SelectItem>
           <SelectItem value="messenger">Chat Messenger</SelectItem>
