@@ -4,7 +4,7 @@ import {
   FileListBar,
   FileUploadButton,
 } from "@/flowise/components/file-upload";
-import { useFlowiseSelector } from "@/flowise/store/store-provider";
+import { useChatSelector } from "@/flowise/store/store-provider";
 import { SendHorizontal } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React from "react";
@@ -14,9 +14,9 @@ interface FlowiseChatInputBarProps {
 }
 
 export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
-  const message = useFlowiseSelector("currentMessage");
-  const isResponding = useFlowiseSelector("isResponding");
-  const setCurrentMessage = useFlowiseSelector("setCurrentMessage");
+  const message = useChatSelector("currentMessage");
+  const isResponding = useChatSelector("isResponding");
+  const setCurrentMessage = useChatSelector("setCurrentMessage");
 
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {

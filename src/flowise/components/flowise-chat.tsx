@@ -1,19 +1,19 @@
 import { FlowiseChatInputBar } from "@/flowise/components/flowise-chat-input-bar";
 import { FlowiseMessageList } from "@/flowise/components/flowise-message-list";
 import { useFlowiseChat } from "@/flowise/hooks/use-flowise-chat";
-import { useFlowiseSelector } from "@/flowise/store/store-provider";
+import { useChatSelector } from "@/flowise/store/store-provider";
 import { useCallback } from "react";
 
 export function FlowiseChat() {
-  const isResponding = useFlowiseSelector("isResponding");
-  const currentMessage = useFlowiseSelector("currentMessage");
-  const files = useFlowiseSelector("files");
-  const setCurrentMessage = useFlowiseSelector("setCurrentMessage");
-  const setFiles = useFlowiseSelector("setFiles");
-  const setResponding = useFlowiseSelector("setResponding");
-  const addMessage = useFlowiseSelector("addMessage");
-  const updateLastMessage = useFlowiseSelector("updateLastMessage");
-  const setError = useFlowiseSelector("setError");
+  const isResponding = useChatSelector("isResponding");
+  const currentMessage = useChatSelector("currentMessage");
+  const files = useChatSelector("files");
+  const setCurrentMessage = useChatSelector("setCurrentMessage");
+  const setFiles = useChatSelector("setFiles");
+  const setResponding = useChatSelector("setResponding");
+  const addMessage = useChatSelector("addMessage");
+  const updateLastMessage = useChatSelector("updateLastMessage");
+  const setError = useChatSelector("setError");
 
   const { handleSend } = useFlowiseChat();
 

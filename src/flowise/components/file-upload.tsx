@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { useFlowiseSelector } from "@/flowise/store/store-provider";
+import { useChatSelector } from "@/flowise/store/store-provider";
 import { ImagePlus, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { memo } from "react";
 
 export const FileListBar = memo(function FileListBar() {
-  const files = useFlowiseSelector("files");
-  const setFiles = useFlowiseSelector("setFiles");
+  const files = useChatSelector("files");
+  const setFiles = useChatSelector("setFiles");
 
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
@@ -46,8 +46,8 @@ export const FileListBar = memo(function FileListBar() {
 });
 
 export const FileUploadButton = memo(function FileUploadButton() {
-  const isResponding = useFlowiseSelector("isResponding");
-  const setFiles = useFlowiseSelector("setFiles");
+  const isResponding = useChatSelector("isResponding");
+  const setFiles = useChatSelector("setFiles");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
