@@ -1,3 +1,4 @@
+import { Message } from "@/chat/types";
 import {
   ChatBubble,
   ChatBubbleAction,
@@ -15,35 +16,53 @@ import {
 } from "@/components/ui/select";
 import { actionIcons } from "@/examples/dify/chat/bubbles/shared-actions";
 import { cn } from "@/lib/utils";
+import { NodeTracing } from "@/playground/types";
 import { useState } from "react";
 import { ChatInputBar } from "./components/chat-input-bar";
 import { WorkflowProcessItem } from "./components/workflow-process-item";
-import { useChat } from "./hooks/use-chat";
+import { usePlaygroundChat } from "./hooks/use-playground-chat";
+import { WorkflowRunningStatus } from "./mocks/utils/event-types";
 
 const endpoints = {
-  basicWorkflow: "/api/chat",
-  memoryWorkflow: "/api/memory-workflow",
-  sequentialWorkflow: "/api/sequential-workflow",
+  ["basic workflow"]: "/api/chat",
+  ["memory workflow"]: "/api/chat-memory",
+  ["sequential workflow"]: "/api/chat-sequential",
+  ["parallel workflow"]: "/api/chat-parallel",
 } as const;
 
 type EndpointKey = keyof typeof endpoints;
 type EndpointValue = (typeof endpoints)[EndpointKey];
 
+interface WorkflowMessage extends Message {
+  workflowProcess?: {
+    status: WorkflowRunningStatus;
+    tracing: NodeTracing[];
+    expand?: boolean;
+  };
+}
+
 export function Playground() {
   const [endpoint, setEndpoint] = useState<EndpointValue>(
-    endpoints.basicWorkflow
+    endpoints["parallel workflow"]
   );
-  const { message, setMessage, chatList, isResponding, handleSend } = useChat();
+  const {
+    messages,
+    isResponding,
+    userInput,
+    setUserInput,
+    sendMessage,
+    isReady,
+  } = usePlaygroundChat(endpoint);
 
   return (
     <div className="ui-flex ui-flex-col ui-justify-between ui-w-full ui-h-full">
       <SelectEndpoint endpoint={endpoint} setEndpoint={setEndpoint} />
       <ChatMessageList>
-        {chatList.map((chat) => (
+        {messages.map((chat: WorkflowMessage) => (
           <ChatBubble
-            variant={chat.isAnswer ? "received" : "sent"}
+            variant={chat.isBot ? "received" : "sent"}
             key={chat.id}
-            className={cn(chat.isAnswer ? "ui-text-start" : "ui-text-end")}
+            className={cn(chat.isBot ? "ui-text-start" : "ui-text-end")}
           >
             <ChatBubbleMessage className="ui-flex ui-flex-col ui-gap-2 ui-min-w-28">
               {chat.workflowProcess && (
@@ -70,10 +89,10 @@ export function Playground() {
         ))}
       </ChatMessageList>
       <ChatInputBar
-        message={message}
-        isResponding={isResponding}
-        onMessageChange={setMessage}
-        onSend={() => handleSend(endpoint)}
+        message={userInput}
+        isResponding={isResponding || !isReady}
+        onMessageChange={setUserInput}
+        onSend={() => sendMessage({ message: userInput })}
       />
     </div>
   );

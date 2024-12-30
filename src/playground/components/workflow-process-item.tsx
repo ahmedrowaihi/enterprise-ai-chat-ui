@@ -14,6 +14,7 @@ import {
   Loader2,
   MessageSquare,
   Search,
+  StopCircle,
   Workflow,
 } from "lucide-react";
 import { useState } from "react";
@@ -74,6 +75,32 @@ interface WorkflowProcessItemProps {
   expand?: boolean;
   onToggleExpand?: () => void;
 }
+// {running && (
+//   <Loader2 className="ui-w-4 ui-h-4 ui-animate-spin ui-text-blue-500" />
+// )}
+// {succeeded && (
+//   <CheckCircle className="ui-w-4 ui-h-4 ui-text-green-500" />
+// )}
+// {failed && <AlertCircle className="ui-w-4 ui-h-4 ui-text-red-500" />}
+
+// {stopped && <StopCircle className="ui-w-4 ui-h-4 ui-text-red-500" />}
+
+const getNodeStatusIcon = (status: WorkflowRunningStatus) => {
+  switch (status) {
+    case WorkflowRunningStatus.Running:
+      return (
+        <Loader2 className="ui-w-4 ui-h-4 ui-animate-spin ui-text-blue-500" />
+      );
+    case WorkflowRunningStatus.Stopped:
+      return <StopCircle className="ui-w-4 ui-h-4 ui-text-red-500" />;
+    case WorkflowRunningStatus.Failed:
+      return <AlertCircle className="ui-w-4 ui-h-4 ui-text-red-500" />;
+    case WorkflowRunningStatus.Succeeded:
+      return <CheckCircle className="ui-w-4 ui-h-4 ui-text-green-500" />;
+    default:
+      return null;
+  }
+};
 
 export function WorkflowProcessItem({
   data,
@@ -81,12 +108,6 @@ export function WorkflowProcessItem({
   onToggleExpand,
 }: WorkflowProcessItemProps) {
   const [collapse, setCollapse] = useState(!expand);
-
-  const running = data.status === WorkflowRunningStatus.Running;
-  const succeeded = data.status === WorkflowRunningStatus.Succeeded;
-  const failed =
-    data.status === WorkflowRunningStatus.Failed ||
-    data.status === WorkflowRunningStatus.Stopped;
 
   return (
     <div className="ui-rounded-xl ui-border ui-border-gray-100 ui-bg-white/50 ui-p-2 ui-shadow-sm">
@@ -97,14 +118,7 @@ export function WorkflowProcessItem({
           onToggleExpand?.();
         }}
       >
-        {running && (
-          <Loader2 className="ui-w-4 ui-h-4 ui-animate-spin ui-text-blue-500" />
-        )}
-        {succeeded && (
-          <CheckCircle className="ui-w-4 ui-h-4 ui-text-green-500" />
-        )}
-        {failed && <AlertCircle className="ui-w-4 ui-h-4 ui-text-red-500" />}
-
+        {getNodeStatusIcon(data.status)}
         <span className="ui-text-sm ui-font-medium ui-text-gray-700">
           Workflow Process
         </span>
@@ -133,7 +147,7 @@ export function WorkflowProcessItem({
                   {node.node_name}
                 </span>
                 <span className="ui-text-xs ui-text-gray-500 ui-ml-auto">
-                  {node.status}
+                  {getNodeStatusIcon(node.status)}
                 </span>
               </div>
             </div>
