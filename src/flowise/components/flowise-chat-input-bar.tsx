@@ -1,23 +1,24 @@
+import { useChatStore } from "@/chat/store/chat-store";
 import { Button } from "@/components/ui/button";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import {
   FileListBar,
   FileUploadButton,
 } from "@/flowise/components/file-upload";
-import { useChatSelector } from "@/flowise/store/store-provider";
 import { SendHorizontal } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React from "react";
+import React, { useMemo } from "react";
 
 interface FlowiseChatInputBarProps {
   onSend: () => void;
 }
 
 export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
-  const message = useChatSelector("currentMessage");
-  const isResponding = useChatSelector("isResponding");
-  const setCurrentMessage = useChatSelector("setCurrentMessage");
-
+  const userInput = useChatStore((state) => state.userInput);
+  const isResponding = useChatStore((state) => state.isResponding);
+  const setUserInput = useChatStore((state) => state.setUserInput);
+  const getCapabilities = useChatStore((state) => state.getCapabilities);
+  const capabilities = useMemo(() => getCapabilities(), [getCapabilities]);
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -26,12 +27,12 @@ export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
 
     if (event.key === "Enter" && event.shiftKey) {
       event.preventDefault();
-      setCurrentMessage(message + "\n");
+      setUserInput(userInput + "\n");
     }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentMessage(event.target.value);
+    setUserInput(event.target.value);
   };
 
   return (
@@ -53,20 +54,20 @@ export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
           }}
         >
           <div className="ui-relative ui-flex-1">
-            <FileListBar />
+            {capabilities?.fileUpload && <FileListBar />}
             <ChatInput
-              value={message}
+              value={userInput}
               onChange={handleInputChange}
               onKeyDown={handleKeyPress}
               placeholder="Type a message..."
               disabled={isResponding}
             />
             <div className="ui-absolute ui-right-2 ui-bottom-1.5 ui-flex ui-gap-1">
-              <FileUploadButton />
+              {capabilities?.fileUpload && <FileUploadButton />}
               <Button
                 className="ui-h-8 ui-w-8 ui-shrink-0"
                 onClick={onSend}
-                disabled={isResponding || !message.trim()}
+                disabled={isResponding || !userInput.trim()}
                 variant="ghost"
                 size="icon"
               >

@@ -1,79 +1,25 @@
-import { FlowiseClient } from "flowise-sdk";
-import { useCallback } from "react";
-import { useConfigSelector } from "../store/store-provider";
+import { useChat } from "@/chat/hooks/use-chat";
+import { useChatStore } from "@/chat/store/chat-store";
+import { FlowiseChatAdapter } from "@/flowise/core/flowise-adapter";
+import { FlowiseConfig } from "@/flowise/core/flowise-config-builder";
+import { useEffect, useState } from "react";
 
-export function useFlowiseChat() {
-  const config = useConfigSelector("config");
-  const flowise = new FlowiseClient({
-    apiKey: config.apiKey,
-    baseUrl: config.baseUrl,
-  });
+export function useFlowiseChat(config: FlowiseConfig) {
+  const [isReady, setIsReady] = useState(false);
+  const { adapter, setAdapter } = useChatStore();
 
-  const handleSend = useCallback(
-    async ({
-      message,
-      files,
-      onStart,
-      onMessage,
-      onError,
-      onFinish,
-    }: {
-      message: string;
-      files?: File[];
-      onStart?: () => void;
-      onMessage?: (message: string) => void;
-      onError?: (error: Error) => void;
-      onFinish?: () => void;
-    }) => {
-      try {
-        onStart?.();
+  useEffect(() => {
+    if (!adapter || !(adapter instanceof FlowiseChatAdapter)) {
+      const newAdapter = new FlowiseChatAdapter(config);
+      newAdapter.onReady(() => {
+        setIsReady(true);
+        setAdapter(newAdapter);
+      });
+      newAdapter.initialize();
+    }
+  }, [adapter, config, setAdapter]);
 
-        const uploads = files
-          ? await Promise.all(
-              files.map(async (file) => {
-                const reader = new FileReader();
-                const data = await new Promise<string>((resolve) => {
-                  reader.onloadend = () => {
-                    const base64 = (reader.result as string).split(",")[1];
-                    resolve(base64);
-                  };
-                  reader.readAsDataURL(file);
-                });
-                return {
-                  name: file.name,
-                  type: file.type,
-                  mime: file.type,
-                  data,
-                };
-              })
-            )
-          : undefined;
+  const chat = useChat(adapter!);
 
-        const prediction = await flowise.createPrediction({
-          chatflowId: config.chatflowId,
-          question: message,
-          streaming: true,
-          uploads,
-        });
-
-        for await (const chunk of prediction) {
-          if (chunk.event === "token") {
-            onMessage?.(chunk.data);
-          }
-        }
-
-        onFinish?.();
-      } catch (error) {
-        console.error("Error:", error);
-        onError?.(
-          error instanceof Error ? error : new Error("An error occurred")
-        );
-      }
-    },
-    [config]
-  );
-
-  return {
-    handleSend,
-  };
+  return { ...chat, isReady };
 }

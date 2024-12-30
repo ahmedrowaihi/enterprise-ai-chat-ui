@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { Pane } from "tweakpane";
-import { useConfigSelector } from "../store/store-provider";
+import { useFlowiseStore } from "../store/flowise-store";
 
 export function FlowiseConfigPane() {
-  const config = useConfigSelector("config");
-  const setConfig = useConfigSelector("setConfig");
+  const config = useFlowiseStore((state) => state.config);
+  const setConfig = useFlowiseStore((state) => state.setConfig);
   const paneRef = useRef<Pane | null>(null);
 
   useEffect(() => {

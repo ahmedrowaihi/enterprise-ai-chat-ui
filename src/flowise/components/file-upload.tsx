@@ -1,16 +1,39 @@
+import { useChatStore } from "@/chat/store/chat-store";
 import { Button } from "@/components/ui/button";
-import { useChatSelector } from "@/flowise/store/store-provider";
-import { ImagePlus, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { FileText, ImagePlus, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { memo } from "react";
+import { memo, useEffect, useMemo } from "react";
 
 export const FileListBar = memo(function FileListBar() {
-  const files = useChatSelector("files");
-  const setFiles = useChatSelector("setFiles");
+  const files = useChatStore((state) => state.files);
+  const setFiles = useChatStore((state) => state.setFiles);
 
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
   };
+
+  const getImagePreview = (file: File) => {
+    if (!file.type.startsWith("image/")) return null;
+    return URL.createObjectURL(file);
+  };
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      files.forEach((file) => {
+        if (file.type.startsWith("image/")) {
+          const url = getImagePreview(file);
+          if (url) URL.revokeObjectURL(url);
+        }
+      });
+    };
+  }, [files]);
 
   return (
     <AnimatePresence initial={false}>
@@ -21,24 +44,42 @@ export const FileListBar = memo(function FileListBar() {
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
-          {files.map((file, index) => (
-            <div
-              key={index}
-              className="ui-flex ui-items-center ui-gap-2 ui-bg-muted ui-px-2 ui-py-1 ui-rounded-md"
-            >
-              <span className="ui-text-sm ui-text-muted-foreground">
-                {file.name}
-              </span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="ui-h-4 ui-w-4"
-                onClick={() => removeFile(index)}
+          {files.map((file, index) => {
+            const imageUrl = getImagePreview(file);
+            return (
+              <div
+                key={index}
+                className="ui-flex ui-items-center ui-gap-2 ui-bg-muted ui-px-2 ui-py-1 ui-rounded-md"
               >
-                <X className="ui-h-3 ui-w-3" />
-              </Button>
-            </div>
-          ))}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger className="ui-flex ui-items-center ui-gap-2">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={file.name}
+                          className="ui-h-6 ui-w-6 ui-object-cover ui-rounded"
+                        />
+                      ) : (
+                        <FileText className="ui-h-6 ui-w-6 ui-text-muted-foreground" />
+                      )}
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="ui-h-4 ui-w-4"
+                        onClick={() => removeFile(index)}
+                      >
+                        <X className="ui-h-3 ui-w-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="ui-text-sm">{file.name}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            );
+          })}
         </motion.div>
       )}
     </AnimatePresence>
@@ -46,13 +87,48 @@ export const FileListBar = memo(function FileListBar() {
 });
 
 export const FileUploadButton = memo(function FileUploadButton() {
-  const isResponding = useChatSelector("isResponding");
-  const setFiles = useChatSelector("setFiles");
+  const isResponding = useChatStore((state) => state.isResponding);
+  const setFiles = useChatStore((state) => state.setFiles);
+  const getCapabilities = useChatStore((state) => state.getCapabilities);
+  const capabilities = useMemo(() => getCapabilities(), [getCapabilities]);
+
+  const acceptedTypes = useMemo(() => {
+    const imageTypes = capabilities.imageUploadConfig[0]?.fileTypes || [];
+    const fileTypes = capabilities.fileUploadConfig[0]?.fileTypes || [];
+    return [...imageTypes, ...fileTypes].join(",");
+  }, [capabilities]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setFiles(Array.from(event.target.files));
-    }
+    if (!event.target.files) return;
+
+    const files = Array.from(event.target.files);
+    const validFiles = files.filter((file) => {
+      // Check if file type is accepted
+      if (!acceptedTypes.includes(file.type)) {
+        console.warn(`File type ${file.type} not supported`);
+        return false;
+      }
+
+      // Check file size
+      const fileSizeMB = file.size / (1024 * 1024);
+      const isImage = file.type.startsWith("image/");
+      const config = isImage
+        ? capabilities.imageUploadConfig[0]
+        : capabilities.fileUploadConfig[0];
+
+      if (!config || fileSizeMB > config.maxUploadSize) {
+        console.warn(
+          `File size ${fileSizeMB.toFixed(1)}MB exceeds limit of ${
+            config?.maxUploadSize
+          }MB`
+        );
+        return false;
+      }
+
+      return true;
+    });
+
+    setFiles(validFiles);
   };
 
   return (
@@ -60,19 +136,20 @@ export const FileUploadButton = memo(function FileUploadButton() {
       <input
         type="file"
         multiple
-        accept="image/*"
+        accept={acceptedTypes}
         className="ui-hidden"
         onChange={handleFileChange}
         id="file-upload"
       />
       <Button
-        className="ui-h-8 ui-w-8 ui-shrink-0"
+        className="ui-h-8 ui-w-8 ui-shrink-0 ui-cursor-pointer"
         type="button"
         disabled={isResponding}
         variant="ghost"
         size="icon"
+        onClick={(e) => e.stopPropagation()}
       >
-        <label htmlFor="file-upload">
+        <label htmlFor="file-upload" className="ui-cursor-pointer">
           <ImagePlus size={20} className="ui-text-muted-foreground" />
         </label>
       </Button>
