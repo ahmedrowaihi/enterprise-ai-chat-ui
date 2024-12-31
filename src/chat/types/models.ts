@@ -1,7 +1,8 @@
-export interface Message {
+export interface Message<TExtra = void> {
   id: string;
   content: string;
   isBot: boolean;
+  extra?: TExtra;
 }
 
 export interface UploadConfig {

@@ -106,7 +106,6 @@ export class FlowiseChatAdapter implements ChatAdapter {
     formData: FormData,
     handlers?: ChatHandlers
   ): Promise<void> {
-    let streamedContent = "";
     try {
       await fetchEventSource(this.config.getEndpoint(), {
         method: "POST",
@@ -126,13 +125,10 @@ export class FlowiseChatAdapter implements ChatAdapter {
           await handlers?.onStreamStart?.(response);
         },
         onmessage(msg) {
-          const chunk = msg.data;
-          const jsonData = JSON.parse(chunk);
-          streamedContent += jsonData.data;
-          handlers?.onStreamMessage?.(jsonData);
+          handlers?.onStreamMessage?.(JSON.parse(msg.data));
         },
         onclose() {
-          handlers?.onStreamEnd?.(streamedContent);
+          handlers?.onStreamEnd?.();
         },
         onerror(err) {
           const error = new FlowiseError(
@@ -301,4 +297,10 @@ export class FlowiseChatAdapter implements ChatAdapter {
   getChatflow() {
     return this.chatflow;
   }
+
+  getAgentIcon = (nodeName?: string) => {
+    if (nodeName) {
+      return "".concat(this.config.baseUrl, "/api/v1/node-icon/", nodeName);
+    }
+  };
 }

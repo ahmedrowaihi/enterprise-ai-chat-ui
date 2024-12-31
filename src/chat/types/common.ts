@@ -4,7 +4,7 @@ import type { NonStreamingResponse } from "./models";
 export interface StreamingHandlers {
   onStreamStart?: (response: Response) => Promise<void>;
   onStreamMessage?: (event: EventSourceMessage) => void;
-  onStreamEnd?: (finalContent: string) => void;
+  onStreamEnd?: (finalContent?: string) => void;
   onStreamError?: (error: Error) => void;
 }
 

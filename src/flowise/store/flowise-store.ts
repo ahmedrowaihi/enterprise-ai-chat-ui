@@ -1,17 +1,20 @@
 import { Message } from "@/chat/types";
 import type { FlowiseConfig } from "@/flowise/core/flowise-config-builder";
 import { FlowiseConfigBuilder } from "@/flowise/core/flowise-config-builder";
+import { FlowiseExtra } from "@/flowise/types";
 import { create } from "zustand";
 
 interface FlowiseState {
   config: FlowiseConfig;
   setConfig: (config: FlowiseConfig) => void;
-  flowiseCurrentMessage: Message | undefined;
+  flowiseCurrentMessage: Message<FlowiseExtra> | undefined;
   setFlowiseCurrentMessage: (
     message:
-      | Message
+      | Message<FlowiseExtra>
       | undefined
-      | ((prev: Message | undefined) => Message | undefined)
+      | ((
+          prev: Message<FlowiseExtra> | undefined
+        ) => Message<FlowiseExtra> | undefined)
   ) => void;
 }
 

@@ -1,10 +1,10 @@
-import { useChatStore } from "@/chat/store/chat-store";
 import { Button } from "@/components/ui/button";
 import { ChatInput } from "@/components/ui/chat/chat-input";
 import {
   FileListBar,
   FileUploadButton,
 } from "@/flowise/components/file-upload";
+import { useFlowiseChatStore } from "@/flowise/store/flowise-chat-store";
 import { SendHorizontal } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useMemo } from "react";
@@ -14,11 +14,12 @@ interface FlowiseChatInputBarProps {
 }
 
 export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
-  const userInput = useChatStore((state) => state.userInput);
-  const isResponding = useChatStore((state) => state.isResponding);
-  const setUserInput = useChatStore((state) => state.setUserInput);
-  const getCapabilities = useChatStore((state) => state.getCapabilities);
+  const userInput = useFlowiseChatStore((state) => state.userInput);
+  const isResponding = useFlowiseChatStore((state) => state.isResponding);
+  const setUserInput = useFlowiseChatStore((state) => state.setUserInput);
+  const getCapabilities = useFlowiseChatStore((state) => state.getCapabilities);
   const capabilities = useMemo(() => getCapabilities(), [getCapabilities]);
+
   const handleKeyPress = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -70,6 +71,7 @@ export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
                 disabled={isResponding || !userInput.trim()}
                 variant="ghost"
                 size="icon"
+                type="button"
               >
                 <SendHorizontal
                   size={20}

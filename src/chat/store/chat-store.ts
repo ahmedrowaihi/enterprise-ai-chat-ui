@@ -1,53 +1,70 @@
 import { create } from "zustand";
 import { ChatAdapter, ChatCapabilities, Message } from "../types";
 
-interface ChatState {
-  messages: Message[];
+interface ChatState<TExtra = void, TAdapter extends ChatAdapter = ChatAdapter> {
+  messages: Message<TExtra>[];
   userInput: string;
   files: File[];
   isResponding: boolean;
   error: string | null;
-  adapter: ChatAdapter;
+  adapter: TAdapter;
 
   getCapabilities: () => ChatCapabilities;
 }
 
-interface ChatActions {
+interface ChatActions<
+  TExtra = void,
+  TAdapter extends ChatAdapter = ChatAdapter
+> {
   setUserInput: (input: string) => void;
   setFiles: (files: File[]) => void;
   setResponding: (isResponding: boolean) => void;
-  addMessage: (content: string, isBot: boolean) => Message;
+  addMessage: (
+    content: string,
+    isBot: boolean,
+    extra?: TExtra
+  ) => Message<TExtra>;
   setError: (error: string | null) => void;
-  setAdapter: (adapter: ChatAdapter) => void;
+  setAdapter: (adapter: TAdapter) => void;
 }
 
-export type ChatStore = ChatState & ChatActions;
+export type ChatStore<
+  TExtra = void,
+  TAdapter extends ChatAdapter = ChatAdapter
+> = ChatState<TExtra, TAdapter> & ChatActions<TExtra, TAdapter>;
 
-export const useChatStore = create<ChatStore>((set, get) => ({
-  messages: [],
-  userInput: "",
-  files: [],
-  isResponding: false,
-  error: null,
-  adapter: undefined!,
-  getCapabilities: () => get().adapter?.getCapabilities(),
+export const createChatStore = <
+  TExtra = void,
+  TAdapter extends ChatAdapter = ChatAdapter
+>() =>
+  create<ChatStore<TExtra, TAdapter>>((set, get) => ({
+    messages: [],
+    userInput: "",
+    files: [],
+    isResponding: false,
+    error: null,
+    adapter: undefined! as TAdapter,
+    getCapabilities: () => get().adapter?.getCapabilities(),
 
-  setUserInput: (input) => set({ userInput: input }),
-  setFiles: (files) => set({ files }),
-  setResponding: (isResponding) => set({ isResponding }),
-  setError: (error) => set({ error }),
-  setAdapter: (adapter) => set({ adapter }),
+    setUserInput: (input) => set({ userInput: input }),
+    setFiles: (files) => set({ files }),
+    setResponding: (isResponding) => set({ isResponding }),
+    setError: (error) => set({ error }),
+    setAdapter: (adapter) => set({ adapter }),
 
-  addMessage: (content, isBot) => {
-    const newMessage = {
-      id: crypto.randomUUID(),
-      content,
-      isBot,
-    };
-    set((state) => ({
-      messages: [...state.messages, newMessage],
-    }));
+    addMessage: (content, isBot, extra) => {
+      const newMessage = {
+        id: crypto.randomUUID(),
+        content,
+        isBot,
+        extra,
+      };
+      set((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
 
-    return newMessage;
-  },
-}));
+      return newMessage;
+    },
+  }));
+
+export const useChatStore = createChatStore();

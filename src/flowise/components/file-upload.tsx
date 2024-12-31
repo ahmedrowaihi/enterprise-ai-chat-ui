@@ -1,4 +1,3 @@
-import { useChatStore } from "@/chat/store/chat-store";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -6,13 +5,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useFlowiseChatStore } from "@/flowise/store/flowise-chat-store";
 import { FileText, ImagePlus, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { memo, useEffect, useMemo } from "react";
 
 export const FileListBar = memo(function FileListBar() {
-  const files = useChatStore((state) => state.files);
-  const setFiles = useChatStore((state) => state.setFiles);
+  const files = useFlowiseChatStore((state) => state.files);
+  const setFiles = useFlowiseChatStore((state) => state.setFiles);
 
   const removeFile = (index: number) => {
     setFiles(files.filter((_, i) => i !== index));
@@ -87,9 +87,9 @@ export const FileListBar = memo(function FileListBar() {
 });
 
 export const FileUploadButton = memo(function FileUploadButton() {
-  const isResponding = useChatStore((state) => state.isResponding);
-  const setFiles = useChatStore((state) => state.setFiles);
-  const getCapabilities = useChatStore((state) => state.getCapabilities);
+  const isResponding = useFlowiseChatStore((state) => state.isResponding);
+  const setFiles = useFlowiseChatStore((state) => state.setFiles);
+  const getCapabilities = useFlowiseChatStore((state) => state.getCapabilities);
   const capabilities = useMemo(() => getCapabilities(), [getCapabilities]);
 
   const acceptedTypes = useMemo(() => {

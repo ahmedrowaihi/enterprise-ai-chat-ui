@@ -1,9 +1,10 @@
-import { useChatStore } from "@/chat/store/chat-store";
 import MessageLoading from "@/components/ui/chat/message-loading";
 import { FlowiseChatInputBar } from "@/flowise/components/flowise-chat-input-bar";
 import { FlowiseMessageList } from "@/flowise/components/flowise-message-list";
 import { useFlowiseChat } from "@/flowise/hooks/use-flowise-chat";
+import { useFlowiseChatStore } from "@/flowise/store/flowise-chat-store";
 import { useFlowiseStore } from "@/flowise/store/flowise-store";
+import type { AgentReasoning } from "@/flowise/types";
 import { useCallback } from "react";
 
 export function FlowiseChat() {
@@ -20,7 +21,7 @@ export function FlowiseChat() {
     files,
     isResponding,
     userInput,
-  } = useChatStore();
+  } = useFlowiseChatStore();
 
   const { handleSend, isReady } = useFlowiseChat(config);
 
@@ -47,6 +48,17 @@ export function FlowiseChat() {
                 id,
                 content: (prev?.content || "") + event.data,
                 isBot: true,
+                extra: prev?.extra,
+              }));
+              break;
+
+            case "agentReasoning":
+              const agentReasonings = event.data as unknown as AgentReasoning[];
+              setFlowiseCurrentMessage((prev) => ({
+                id,
+                content: prev?.content || "",
+                isBot: true,
+                extra: { agentReasonings },
               }));
               break;
 
@@ -56,6 +68,7 @@ export function FlowiseChat() {
                 id: metadata.chatMessageId,
                 content: prev?.content || "",
                 isBot: true,
+                extra: prev?.extra,
               }));
               break;
             case "start":
@@ -65,7 +78,7 @@ export function FlowiseChat() {
         },
         onStreamEnd: () => {
           setFlowiseCurrentMessage((prev) => {
-            addMessage(prev?.content || "", true);
+            addMessage(prev?.content || "", true, prev?.extra);
             return undefined;
           });
           setResponding(false);
