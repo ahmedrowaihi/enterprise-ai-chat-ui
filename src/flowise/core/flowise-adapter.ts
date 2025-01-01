@@ -70,7 +70,6 @@ export class FlowiseChatAdapter implements ChatAdapter {
       return {
         streaming: true,
         fileUpload: false,
-        multiModal: false,
         markdown: true,
         codeHighlight: true,
         latex: false,
@@ -85,10 +84,9 @@ export class FlowiseChatAdapter implements ChatAdapter {
     // Map Flowise capabilities to standard ones
     return {
       streaming: this.flowiseCapabilities.isStreaming,
-      fileUpload:
-        this.flowiseCapabilities.isImageUploadAllowed ||
-        this.flowiseCapabilities.isRAGFileUploadAllowed,
-      multiModal: this.flowiseCapabilities.isImageUploadAllowed,
+      fileUpload: this.flowiseCapabilities.isImageUploadAllowed,
+      // ||
+      // this.flowiseCapabilities.isRAGFileUploadAllowed,
       markdown: true, // Flowise always supports markdown
       codeHighlight: true, // Flowise always supports code highlighting
       latex: false, // Flowise doesn't support LaTeX by default

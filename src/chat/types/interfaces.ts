@@ -21,7 +21,6 @@ export interface ChatAdapter {
 export interface ChatCapabilities {
   streaming: boolean;
   fileUpload: boolean;
-  multiModal: boolean;
   markdown: boolean;
   codeHighlight: boolean;
   latex: boolean;
