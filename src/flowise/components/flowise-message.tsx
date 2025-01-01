@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChatBubble,
-  ChatBubbleAction,
   ChatBubbleActionWrapper,
   ChatBubbleMessage,
   ChatBubbleMessageProps,
@@ -16,15 +15,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-// import { actionIcons } from "@/flowise/components/flowise-message-actions";
 import { FlowiseExtra } from "@/flowise/types";
-import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import JsonView from "@uiw/react-json-view";
-import { ClipboardCopy } from "lucide-react";
 import { memo, useMemo } from "react";
 import { useFlowiseChatStore } from "../store/flowise-chat-store";
 import { MemoizedReactMarkdown } from "./markdown/MemoizedReactMarkdown";
+import { CopyAction, SpeakAction } from "./message-actions";
 
 interface FlowiseMessageProps {
   message: Message<FlowiseExtra>;
@@ -35,7 +32,6 @@ export const FlowiseMessage = memo(function FlowiseMessage({
   message,
   bubbleMessageProps,
 }: FlowiseMessageProps) {
-  // use adapter
   const adapter = useFlowiseChatStore((state) => state.adapter);
 
   const { usedTools, sourceDocuments, artifacts, state } = useMemo(() => {
@@ -70,21 +66,6 @@ export const FlowiseMessage = memo(function FlowiseMessage({
       }, initialValues) || initialValues
     );
   }, [message.extra]);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(message.content);
-      toast({
-        title: "Copied to clipboard",
-        variant: "success",
-      });
-    } catch (error) {
-      toast({
-        title: "Failed to copy to clipboard",
-        variant: "error",
-      });
-    }
-  };
 
   return (
     <ChatBubble
@@ -224,11 +205,8 @@ export const FlowiseMessage = memo(function FlowiseMessage({
         </span>
         {message.isBot && (
           <ChatBubbleActionWrapper className="ui-gap-1">
-            <ChatBubbleAction
-              className="ui-size-6"
-              icon={<ClipboardCopy className="ui-size-4" />}
-              onClick={handleCopy}
-            />
+            <CopyAction message={message} />
+            <SpeakAction message={message} />
           </ChatBubbleActionWrapper>
         )}
       </ChatBubbleMessage>
