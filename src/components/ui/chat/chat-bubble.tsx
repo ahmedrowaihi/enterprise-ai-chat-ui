@@ -149,7 +149,7 @@ const ChatBubbleAction: React.FC<ChatBubbleActionProps> = ({
   icon,
   onClick,
   className,
-  variant = "ghost",
+  variant = "outline",
   size = "icon",
   ...props
 }) => (
@@ -174,20 +174,7 @@ const ChatBubbleActionWrapper = React.forwardRef<
   HTMLDivElement,
   ChatBubbleActionWrapperProps
 >(({ variant, className, children, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn(
-      "ui-absolute -ui-bottom-8 sm:ui-bottom-0 ui-flex",
-      {
-        "ui-left-0 ui-translate-x-0 sm:-ui-left-1 sm:-ui-translate-x-full ui-flex-row-reverse":
-          variant === "sent",
-        "sm:-ui-right-1 sm:ui-translate-x-full ui-left-0 ui-translate-x-0":
-          variant === "received",
-      },
-      className
-    )}
-    {...props}
-  >
+  <div ref={ref} className={cn("ui-flex", className)} {...props}>
     {children}
   </div>
 ));

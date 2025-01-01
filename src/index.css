@@ -61,6 +61,13 @@ body {
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --toast-success: 142 76% 97%;
+    --toast-success-foreground: 142 72% 29%;
+    --toast-error: 0 84% 97%;
+    --toast-error-foreground: 0 84% 60%;
+    --toast-warning: 38 92% 95%;
+    --toast-warning-foreground: 38 92% 50%;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -95,6 +102,13 @@ body {
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --toast-success: 142 72% 29%;
+    --toast-success-foreground: 144 70% 96%;
+    --toast-error: 0 84% 60%;
+    --toast-error-foreground: 0 0% 98%;
+    --toast-warning: 38 92% 50%;
+    --toast-warning-foreground: 48 96% 89%;
   }
 }
 

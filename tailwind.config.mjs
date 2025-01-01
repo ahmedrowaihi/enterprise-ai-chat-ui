@@ -46,6 +46,14 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        toast: {
+          success: "hsl(var(--toast-success))",
+          "success-foreground": "hsl(var(--toast-success-foreground))",
+          error: "hsl(var(--toast-error))",
+          "error-foreground": "hsl(var(--toast-error-foreground))",
+          warning: "hsl(var(--toast-warning))",
+          "warning-foreground": "hsl(var(--toast-warning-foreground))",
+        },
         chart: {
           1: "hsl(var(--chart-1))",
           2: "hsl(var(--chart-2))",
