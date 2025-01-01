@@ -103,7 +103,7 @@ export class FlowiseChatAdapter implements ChatAdapter {
   }
 
   private async handleSSEStreaming(
-    formData: FormData,
+    data: any,
     handlers?: ChatHandlers
   ): Promise<void> {
     try {
@@ -112,8 +112,9 @@ export class FlowiseChatAdapter implements ChatAdapter {
         openWhenHidden: true,
         headers: {
           ...(this.config.getAuthHeaders() as Record<string, string>),
-        },
-        body: formData,
+          "Content-Type": "application/json",
+        } as Record<string, string>,
+        body: JSON.stringify(data),
         async onopen(response) {
           if (!response.ok) {
             throw new FlowiseError(
@@ -155,14 +156,17 @@ export class FlowiseChatAdapter implements ChatAdapter {
   }
 
   private async handleNonStreaming(
-    formData: FormData,
+    data: any,
     handlers?: ChatHandlers
   ): Promise<void> {
     handlers?.onStart?.();
     const response = await fetch(this.config.getEndpoint(), {
       method: "POST",
-      headers: this.config.getAuthHeaders(),
-      body: formData,
+      headers: {
+        ...(this.config.getAuthHeaders() as Record<string, string>),
+        "Content-Type": "application/json",
+      } as Record<string, string>,
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -220,9 +224,10 @@ export class FlowiseChatAdapter implements ChatAdapter {
     try {
       const isStreamingEnabled = capabilities.streaming;
 
-      // Prepare request
-      const formData = new FormData();
-      formData.append("question", message);
+      // Prepare request data
+      const requestData: any = {
+        question: message,
+      };
 
       // Handle file uploads based on type
       if (files.length > 0) {
@@ -233,35 +238,64 @@ export class FlowiseChatAdapter implements ChatAdapter {
           (file) => !file.type.startsWith("image/")
         );
 
+        const allUploads = [];
+
         // Handle image uploads
         if (capabilities.imageUpload && imageFiles.length > 0) {
-          imageFiles.forEach((file) => {
-            // Validate against image upload config
-            const config = capabilities.imageUploadConfig[0];
-            if (config && this.validateFile(file, config)) {
-              formData.append("files", file);
-            }
-          });
+          const uploads = await Promise.all(
+            imageFiles.map(async (file) => {
+              // Validate against image upload config
+              const config = capabilities.imageUploadConfig[0];
+              if (config && this.validateFile(file, config)) {
+                const base64 = await this.fileToBase64(file);
+                return {
+                  data: base64,
+                  type: "file",
+                  name: file.name,
+                  mime: file.type,
+                };
+              }
+              return null;
+            })
+          );
+
+          allUploads.push(...uploads.filter(Boolean));
         }
 
         // Handle RAG file uploads
         if (capabilities.ragFileUpload && otherFiles.length > 0) {
-          otherFiles.forEach((file) => {
-            // Validate against file upload config
-            const config = capabilities.fileUploadConfig[0];
-            if (config && this.validateFile(file, config)) {
-              formData.append("files", file);
-            }
-          });
+          const uploads = await Promise.all(
+            otherFiles.map(async (file) => {
+              // Validate against file upload config
+              const config = capabilities.fileUploadConfig[0];
+              if (config && this.validateFile(file, config)) {
+                const base64 = await this.fileToBase64(file);
+                return {
+                  data: base64,
+                  type: "file",
+                  name: file.name,
+                  mime: file.type,
+                };
+              }
+              return null;
+            })
+          );
+
+          allUploads.push(...uploads.filter(Boolean));
+        }
+
+        // Add uploads to request data
+        if (allUploads.length > 0) {
+          requestData.uploads = allUploads;
         }
       }
 
       if (isStreamingEnabled) {
-        formData.append("streaming", "true");
+        requestData.streaming = true;
         messageHandler = this.handleSSEStreaming;
       }
 
-      await messageHandler.call(this, formData, handlers);
+      await messageHandler.call(this, requestData, handlers);
     } catch (err) {
       const error =
         err instanceof FlowiseError
@@ -275,6 +309,15 @@ export class FlowiseChatAdapter implements ChatAdapter {
       }
       throw error;
     }
+  }
+
+  private async fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   }
 
   private validateFile(file: File, config: UploadConfig): boolean {

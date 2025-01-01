@@ -43,6 +43,9 @@ export function FlowiseChat() {
         files,
         onStreamMessage: (event) => {
           switch (event.event) {
+            case "error":
+              setError(event.data);
+              break;
             case "token":
               setFlowiseCurrentMessage((prev) => ({
                 id,

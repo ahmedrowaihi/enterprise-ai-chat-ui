@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -53,24 +53,28 @@ export const FileListBar = memo(function FileListBar() {
               >
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className="ui-flex ui-items-center ui-gap-2">
-                      {imageUrl ? (
-                        <img
-                          src={imageUrl}
-                          alt={file.name}
-                          className="ui-h-6 ui-w-6 ui-object-cover ui-rounded"
-                        />
-                      ) : (
-                        <FileText className="ui-h-6 ui-w-6 ui-text-muted-foreground" />
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="ui-h-4 ui-w-4"
-                        onClick={() => removeFile(index)}
-                      >
-                        <X className="ui-h-3 ui-w-3" />
-                      </Button>
+                    <TooltipTrigger asChild>
+                      <div className="ui-flex ui-items-center ui-gap-2">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt={file.name}
+                            className="ui-h-6 ui-w-6 ui-object-cover ui-rounded"
+                          />
+                        ) : (
+                          <FileText className="ui-h-6 ui-w-6 ui-text-muted-foreground" />
+                        )}
+                        <div
+                          className={buttonVariants({
+                            variant: "ghost",
+                            size: "icon",
+                            className: "ui-h-4 ui-w-4",
+                          })}
+                          onClick={() => removeFile(index)}
+                        >
+                          <X className="ui-h-3 ui-w-3" />
+                        </div>
+                      </div>
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="ui-text-sm">{file.name}</p>
