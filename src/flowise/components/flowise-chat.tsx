@@ -21,6 +21,7 @@ export function FlowiseChat() {
     files,
     isResponding,
     userInput,
+    adapter,
   } = useFlowiseChatStore();
 
   const { handleSend, isReady } = useFlowiseChat(config);
@@ -75,6 +76,9 @@ export function FlowiseChat() {
 
               case "metadata":
                 const metadata = event.data as any;
+                if (metadata.chatId) {
+                  adapter.setChatId(metadata.chatId);
+                }
                 setFlowiseCurrentMessage((prev) => ({
                   id: metadata.chatMessageId,
                   content: prev?.content || "",

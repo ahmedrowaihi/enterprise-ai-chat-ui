@@ -21,7 +21,7 @@ import JsonView from "@uiw/react-json-view";
 import { memo, useMemo } from "react";
 import { useFlowiseChatStore } from "../store/flowise-chat-store";
 import { MemoizedReactMarkdown } from "./markdown/MemoizedReactMarkdown";
-import { CopyAction, SpeakAction } from "./message-actions";
+import { CopyAction, FeedbackAction, SpeakAction } from "./message-actions";
 
 interface FlowiseMessageProps {
   message: Message<FlowiseExtra>;
@@ -207,6 +207,7 @@ export const FlowiseMessage = memo(function FlowiseMessage({
           <ChatBubbleActionWrapper className="ui-gap-1">
             <CopyAction message={message} />
             <SpeakAction message={message} />
+            <FeedbackAction message={message} />
           </ChatBubbleActionWrapper>
         )}
       </ChatBubbleMessage>

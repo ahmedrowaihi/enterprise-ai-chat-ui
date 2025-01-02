@@ -12,6 +12,21 @@ import { FlowiseConfig } from "@/flowise/core/flowise-config-builder";
 import { ChatflowType, FlowiseError } from "@/flowise/core/types";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 
+interface FeedbackRequest {
+  messageId: string;
+  rating: "THUMBS_UP" | "THUMBS_DOWN";
+}
+
+interface FeedbackUpdateRequest {
+  content: string;
+}
+
+interface FeedbackResponse {
+  id: string;
+  rating: "THUMBS_UP" | "THUMBS_DOWN";
+  content?: string;
+}
+
 export class FlowiseChatAdapter implements ChatAdapter {
   private initPromise?: Promise<void>;
   private client: FlowiseClient;
@@ -19,11 +34,21 @@ export class FlowiseChatAdapter implements ChatAdapter {
   private chatflow?: ChatflowType;
   private readyCallbacks: (() => void)[] = [];
   private isInitialized = false;
+  private chatId?: string;
+
   constructor(private config: FlowiseConfig) {
     this.client = new FlowiseClient({
       apiKey: config.apiKey,
       baseUrl: config.baseUrl,
     });
+  }
+
+  setChatId(chatId: string) {
+    this.chatId = chatId;
+  }
+
+  getChatId() {
+    return this.chatId;
   }
 
   onReady(callback: () => void): void {
@@ -227,6 +252,10 @@ export class FlowiseChatAdapter implements ChatAdapter {
         question: message,
       };
 
+      if (this.chatId) {
+        requestData.chatId = this.chatId;
+      }
+
       // Handle file uploads based on type
       if (files.length > 0) {
         const imageFiles = files.filter((file) =>
@@ -344,4 +373,62 @@ export class FlowiseChatAdapter implements ChatAdapter {
       return "".concat(this.config.baseUrl, "/api/v1/node-icon/", nodeName);
     }
   };
+
+  async submitFeedback(
+    data: Omit<FeedbackRequest, "chatId" | "content">
+  ): Promise<FeedbackResponse> {
+    if (!this.chatId) {
+      throw new FlowiseError("No chat ID set. Call setChatId first.");
+    }
+
+    const response = await fetch(`${this.config.baseUrl}/api/v1/feedback`, {
+      method: "POST",
+      headers: {
+        ...(this.config.getAuthHeaders() as Record<string, string>),
+        "Content-Type": "application/json",
+      } as Record<string, string>,
+      body: JSON.stringify({
+        chatflowid: this.config.chatflowId,
+        chatId: this.chatId,
+        ...data,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new FlowiseError(
+        `Failed to submit feedback: ${response.statusText}`,
+        response,
+        false
+      );
+    }
+
+    return response.json();
+  }
+
+  async updateFeedback(
+    id: string,
+    data: FeedbackUpdateRequest
+  ): Promise<FeedbackResponse> {
+    const response = await fetch(
+      `${this.config.baseUrl}/api/v1/feedback/${id}`,
+      {
+        method: "PUT",
+        headers: {
+          ...(this.config.getAuthHeaders() as Record<string, string>),
+          "Content-Type": "application/json",
+        } as Record<string, string>,
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new FlowiseError(
+        `Failed to update feedback: ${response.statusText}`,
+        response,
+        false
+      );
+    }
+
+    return response.json();
+  }
 }
