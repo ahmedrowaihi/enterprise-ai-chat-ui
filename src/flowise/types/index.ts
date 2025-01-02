@@ -11,4 +11,8 @@ export interface AgentReasoning {
 
 export interface FlowiseExtra {
   agentReasonings?: AgentReasoning[];
+  metadata?: {
+    followUpPrompts?: string[];
+    [key: string]: any;
+  };
 }

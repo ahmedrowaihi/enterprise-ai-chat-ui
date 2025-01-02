@@ -25,106 +25,122 @@ export function FlowiseChat() {
 
   const { handleSend, isReady } = useFlowiseChat(config);
 
-  const onStart = useCallback(() => {
-    addMessage(userInput, false);
-    setUserInput("");
-  }, [userInput, addMessage, setUserInput]);
+  const onStart = useCallback(
+    (message: string) => {
+      addMessage(message, false);
+      setUserInput("");
+    },
+    [userInput, addMessage, setUserInput]
+  );
 
-  const onSend = useCallback(async () => {
-    if (!userInput.trim() || isResponding) return;
+  const onSend = useCallback(
+    async (message?: string) => {
+      if (!message) {
+        message = userInput;
+      }
+      if (!message.trim() || isResponding) return;
 
-    try {
-      onStart();
-      setResponding(true);
+      try {
+        onStart(message);
+        setResponding(true);
 
-      const id = crypto.randomUUID();
-      await handleSend({
-        message: userInput,
-        files,
-        onStreamMessage: (event) => {
-          switch (event.event) {
-            case "error":
-              setError(event.data);
-              break;
-            case "token":
-              setFlowiseCurrentMessage((prev) => ({
-                id,
-                content: (prev?.content || "") + event.data,
-                isBot: true,
-                extra: prev?.extra,
-              }));
-              break;
+        const id = crypto.randomUUID();
+        await handleSend({
+          message,
+          files,
+          onStreamMessage: (event) => {
+            switch (event.event) {
+              case "error":
+                setError(event.data);
+                break;
+              case "token":
+                setFlowiseCurrentMessage((prev) => ({
+                  id,
+                  content: (prev?.content || "") + event.data,
+                  isBot: true,
+                  extra: prev?.extra,
+                }));
+                break;
 
-            case "agentReasoning":
-              const agentReasonings = event.data as unknown as AgentReasoning[];
-              setFlowiseCurrentMessage((prev) => ({
-                id,
-                content: prev?.content || "",
-                isBot: true,
-                extra: { agentReasonings },
-              }));
-              break;
+              case "agentReasoning":
+                const agentReasonings =
+                  event.data as unknown as AgentReasoning[];
+                setFlowiseCurrentMessage((prev) => ({
+                  id,
+                  content: prev?.content || "",
+                  isBot: true,
+                  extra: { agentReasonings },
+                }));
+                break;
 
-            case "metadata":
-              const metadata = event.data as any;
-              setFlowiseCurrentMessage((prev) => ({
-                id: metadata.chatMessageId,
-                content: prev?.content || "",
-                isBot: true,
-                extra: prev?.extra,
-              }));
-              break;
-            case "start":
-            case "end":
-              break;
-          }
-        },
-        onStreamEnd: () => {
-          setFlowiseCurrentMessage((prev) => {
-            addMessage(prev?.content || "", true, prev?.extra);
-            return undefined;
-          });
-          setResponding(false);
-          setFiles([]);
-        },
-        onResponse: (response) => {
-          // Handle non-streaming response
-          addMessage(response.text, true);
-          setResponding(false);
-          setFiles([]);
-        },
-        onStreamError: (error) => {
-          setError(error.message);
-          setResponding(false);
-          addMessage("", true);
-          setFiles([]);
-        },
-        onError: (error) => {
-          setError(error.message);
-          setResponding(false);
-          addMessage("", true);
-          setFiles([]);
-        },
-      });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-      setResponding(false);
-      addMessage("", true);
-      setFiles([]);
-    }
-  }, [
-    userInput,
-    isResponding,
-    files,
-    handleSend,
-    setUserInput,
-    setFiles,
-    addMessage,
-    setError,
-    setFlowiseCurrentMessage,
-    setResponding,
-    onStart,
-  ]);
+              case "metadata":
+                const metadata = event.data as any;
+                setFlowiseCurrentMessage((prev) => ({
+                  id: metadata.chatMessageId,
+                  content: prev?.content || "",
+                  isBot: true,
+                  extra: {
+                    ...prev?.extra,
+                    metadata: {
+                      ...prev?.extra?.metadata,
+                      followUpPrompts: metadata.followUpPrompts,
+                    },
+                  },
+                }));
+                break;
+              case "start":
+              case "end":
+                break;
+            }
+          },
+          onStreamEnd: () => {
+            setFlowiseCurrentMessage((prev) => {
+              addMessage(prev?.content || "", true, prev?.extra);
+              return undefined;
+            });
+            setResponding(false);
+            setFiles([]);
+          },
+          onResponse: (response) => {
+            // Handle non-streaming response
+            addMessage(response.text, true);
+            setResponding(false);
+            setFiles([]);
+          },
+          onStreamError: (error) => {
+            setError(error.message);
+            setResponding(false);
+            addMessage("", true);
+            setFiles([]);
+          },
+          onError: (error) => {
+            setError(error.message);
+            setResponding(false);
+            addMessage("", true);
+            setFiles([]);
+          },
+        });
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "An error occurred");
+        setResponding(false);
+        addMessage("", true);
+        setFiles([]);
+      }
+    },
+    [
+      userInput,
+      isResponding,
+      files,
+      handleSend,
+      setUserInput,
+      setFiles,
+      addMessage,
+      setError,
+      setFlowiseCurrentMessage,
+      setResponding,
+      onStart,
+    ]
+  );
 
   return (
     <div className="ui-h-[calc(100vh-10vh)] ui-min-w-full">

@@ -7,6 +7,7 @@ import React, { useMemo } from "react";
 import { AudioListBar } from "./audio-recorder/audio-list-bar";
 import { AudioRecorder } from "./audio-recorder/audio-recorder";
 import { FileListBar, FileUploadButton } from "./file-manager";
+import { FollowUpPrompts } from "./follow-ups/follow-up-prompts";
 
 interface FlowiseChatInputBarProps {
   onSend: () => void;
@@ -40,7 +41,7 @@ export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
       <AnimatePresence initial={false}>
         <motion.div
           key="input"
-          className="ui-flex ui-items-center ui-gap-2"
+          className="ui-flex ui-flex-col ui-gap-4"
           layout
           initial={{ opacity: 0, scale: 1 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -53,6 +54,7 @@ export function FlowiseChatInputBar({ onSend }: FlowiseChatInputBarProps) {
             },
           }}
         >
+          <FollowUpPrompts onSend={onSend} />
           <div className="ui-relative ui-flex-1">
             {capabilities?.fileUpload && <FileListBar />}
             {capabilities?.speechToText && <AudioListBar />}
