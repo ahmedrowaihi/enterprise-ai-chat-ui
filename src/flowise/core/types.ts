@@ -26,3 +26,31 @@ export class FlowiseError extends Error {
     this.name = "FlowiseError";
   }
 }
+
+export interface LeadConfig {
+  status: boolean;
+  title: string;
+  successMessage: string;
+  name: boolean;
+  email: boolean;
+  phone: boolean;
+}
+
+export interface Lead {
+  name?: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface ChatflowConfig {
+  followUpPrompts?: {
+    status: boolean;
+  };
+  allowedOrigins?: string[];
+  allowedOriginsError?: string;
+  chatFeedback?: {
+    status: boolean;
+  };
+  starterPrompts?: Record<string, { prompt: string }>;
+  leads?: LeadConfig;
+}

@@ -9,7 +9,12 @@ import {
   FlowiseClient,
 } from "@/flowise/core/flowise-client";
 import { FlowiseConfig } from "@/flowise/core/flowise-config-builder";
-import { ChatflowType, FlowiseError } from "@/flowise/core/types";
+import {
+  ChatflowType,
+  FlowiseError,
+  Lead,
+  LeadConfig,
+} from "@/flowise/core/types";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 interface FeedbackRequest {
@@ -35,6 +40,8 @@ export class FlowiseChatAdapter implements ChatAdapter {
   private readyCallbacks: (() => void)[] = [];
   private isInitialized = false;
   private chatId?: string;
+  private lead?: Lead;
+  private leadConfig?: LeadConfig;
 
   constructor(private config: FlowiseConfig) {
     this.client = new FlowiseClient({
@@ -49,6 +56,14 @@ export class FlowiseChatAdapter implements ChatAdapter {
 
   getChatId() {
     return this.chatId;
+  }
+
+  getLead() {
+    return this.lead;
+  }
+
+  getLeadConfig() {
+    return this.leadConfig;
   }
 
   onReady(callback: () => void): void {
@@ -74,6 +89,25 @@ export class FlowiseChatAdapter implements ChatAdapter {
         this.chatflow = chatflow;
         this.flowiseCapabilities = capabilities;
 
+        // Parse chatbot config
+        if (chatflow.chatbotConfig) {
+          try {
+            const config = JSON.parse(chatflow.chatbotConfig);
+            if (config.leads?.status) {
+              this.leadConfig = config.leads;
+              // Get lead if chatId exists
+              if (this.chatId) {
+                const lead = await this.client.getLead(this.chatId);
+                if (lead) {
+                  this.lead = lead;
+                }
+              }
+            }
+          } catch (error) {
+            console.error("Failed to parse chatbot config:", error);
+          }
+        }
+
         this.isInitialized = true;
         this.readyCallbacks.forEach((callback) => callback());
       } catch (error) {
@@ -83,6 +117,25 @@ export class FlowiseChatAdapter implements ChatAdapter {
     })();
 
     return this.initPromise;
+  }
+
+  async saveLead(lead: Lead): Promise<void> {
+    if (!this.chatId) {
+      throw new FlowiseError("No chat ID set. Call setChatId first.");
+    }
+
+    try {
+      await this.client.addLead({
+        chatflowid: this.config.chatflowId,
+        chatId: this.chatId,
+        ...lead,
+      });
+      this.lead = lead;
+    } catch (error) {
+      throw new FlowiseError(
+        error instanceof Error ? error.message : "Failed to save lead"
+      );
+    }
   }
 
   getConfig(): FlowiseConfig {

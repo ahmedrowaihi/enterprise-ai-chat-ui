@@ -1,3 +1,5 @@
+import { Lead } from "./types";
+
 export interface FlowiseClientConfig {
   baseUrl: string;
   apiKey: string;
@@ -21,12 +23,15 @@ export interface ChatflowCapabilities {
 export class FlowiseClient {
   constructor(private config: FlowiseClientConfig) {}
 
-  private async request(path: string) {
+  private async request(path: string, init?: RequestInit) {
     try {
       const response = await fetch(`${this.config.baseUrl}/api/v1${path}`, {
+        ...init,
         headers: {
+          ...init?.headers,
           Authorization: `Bearer ${this.config.apiKey}`,
           Accept: "application/json",
+          "Content-Type": "application/json",
         },
       });
 
@@ -88,5 +93,29 @@ export class FlowiseClient {
 
   async getChatflow(id: string) {
     return this.request(`/chatflows/${id}`);
+  }
+
+  async getLead(chatId: string): Promise<Lead | null> {
+    try {
+      return await this.request(`/leads/${chatId}`);
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn("Failed to get lead:", error);
+      }
+      return null;
+    }
+  }
+
+  async addLead(data: {
+    chatflowid: string;
+    chatId: string;
+    name?: string;
+    email?: string;
+    phone?: string;
+  }): Promise<void> {
+    await this.request(`/leads`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
   }
 }
